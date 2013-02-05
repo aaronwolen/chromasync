@@ -82,6 +82,7 @@ fi
 # Download filelist
 curl --silent $filelist > $destdir/inventory.txt
 
+echo Syncing with $1
 rsync --times --log-file=$destdir/rsync.log --files-from=$destdir/inventory.txt --group=reimers --chmod=a+rwx,g+r,o+r rsync://$repo $destdir
 
 
@@ -89,14 +90,15 @@ rsync --times --log-file=$destdir/rsync.log --files-from=$destdir/inventory.txt 
 # = convert wig files to bigWig format =
 # ======================================
 
-fetchChromSizes=$(check_installed fetchChromSizes)
+# Obtain chromosome sizes
+chrsizes=$PWD/hg19.chrs
+if [ ! -f "$chrsizes" ]; then
+  echo Downloading chromosome sizes
+  fetchChromSizes=$(check_installed fetchChromSizes)
+  $fetchChromSizes hg19 > $chrsizes
+fi
+  
 wigToBigWig=$(check_installed wigToBigWig)
-
-
-# Obtain chromosome sizes (creates a tmpi folder in ~)
-mkdir --parents $TMPDIR
-chrsizes="$(mktemp)"
-$fetchChromSizes hg19 > $chrsizes
   
 wigs=( $(find $destdir -name "*.wig.gz") )
 
