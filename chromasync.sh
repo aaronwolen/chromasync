@@ -83,7 +83,7 @@ fi
 curl --silent $filelist > $destdir/inventory.txt
 
 echo Syncing with $1
-rsync --times --log-file=$destdir/rsync.log --files-from=$destdir/inventory.txt --group=reimers --chmod=a+rwx,g+r,o+r rsync://$repo $destdir
+rsync --times --log-file=$destdir/rsync.log --files-from=$destdir/inventory.txt --group=reimers --chmod=a+rwx,g+rw,o+r rsync://$repo $destdir
 
 
 # ======================================
@@ -116,6 +116,8 @@ for wigfile in "${wigs[@]}"; do
 
   # Convert wig to bigwig
   if [ $convert -eq 1 ]; then
+    echo Converting 
+    
     qsub_cmd="$wigToBigWig $wigfile $chrsizes $bigwigfile"
     jobname=$( make_jobname $wigfile w2bw )
     
